@@ -102,7 +102,7 @@
                         document.getElementById("tooltip").getContext('2d').textAlign="center";
                         document.getElementById("tooltip").getContext('2d').textBaseline = 'middle';
                         document.getElementById("tooltip").getContext('2d').font= "24px Verdana";
-                        document.getElementById("tooltip").getContext('2d').fillText(response.faceAttributes.gender+",Age  : "+response.faceAttributes.age, 100,25,200);
+                        document.getElementById("tooltip").getContext('2d').fillText(response.faceAttributes.gender+",Age : "+response.faceAttributes.age, 125,25,250);
                         break;
                     }
                     else {
@@ -138,7 +138,7 @@
         你的圖片:
         <br><br>
         <canvas id="sourceImage"></canvas>       
-        <canvas id="tooltip" width="200" height="50" style="display:none;position:absolute;background-color:gray;"></canvas> 
+        <canvas id="tooltip" width="250" height="50" style="display:none;position:absolute;background-color:gray;"></canvas> 
     </div>
 </div>
 <footer>
