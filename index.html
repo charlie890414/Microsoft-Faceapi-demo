@@ -97,14 +97,12 @@
                     if (x >= linkX && x <= (linkX + linkWidth) && y >= linkY && y <= (linkY + linkHeight)){
                         document.getElementById("tooltip").style.display = "";
                         document.getElementById("tooltip").style.left = getPosition(document.getElementById("sourceImage")).x + linkX + "px";
-                        document.getElementById("tooltip").style.width = 300 + "px";
                         document.getElementById("tooltip").style.top = getPosition(document.getElementById("sourceImage")).y + linkY + linkHeight + "px";
-                        document.getElementById("tooltip").style.height = 50 + "px";
                         document.getElementById("tooltip").getContext('2d').clearRect(0, 0, document.getElementById("tooltip").width, document.getElementById("tooltip").height); 
-                        document.getElementById("tooltip").getContext('2d').textAlign="start";
-                        document.getElementById("tooltip").getContext('2d').textBaseline = 'hanging';
-                        document.getElementById("tooltip").getContext('2d').font = "40px arial";
-                        document.getElementById("tooltip").getContext('2d').fillText(response.faceAttributes.gender+",Age  : "+response.faceAttributes.age, 5 ,40);
+                        document.getElementById("tooltip").getContext('2d').textAlign="center";
+                        document.getElementById("tooltip").getContext('2d').textBaseline = 'middle';
+                        document.getElementById("tooltip").getContext('2d').font= "24px Verdana";
+                        document.getElementById("tooltip").getContext('2d').fillText(response.faceAttributes.gender+",Age  : "+response.faceAttributes.age, 150,25);
                         break;
                     }
                     else {
@@ -140,7 +138,7 @@
         你的圖片:
         <br><br>
         <canvas id="sourceImage"></canvas>       
-        <canvas id="tooltip" style="display:none;position:absolute;background-color:gray;"></canvas> 
+        <canvas id="tooltip" width="300" height="50" style="display:none;position:absolute;background-color:gray;"></canvas> 
     </div>
 </div>
 <footer>
