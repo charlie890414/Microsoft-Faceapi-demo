@@ -97,7 +97,7 @@
                     if (x >= linkX && x <= (linkX + linkWidth) && y >= linkY && y <= (linkY + linkHeight)){
                         document.getElementById("tooltip").style.display = "";
                         document.getElementById("tooltip").style.left = getPosition(document.getElementById("sourceImage")).x + linkX + "px";
-                        document.getElementById("tooltip").style.top = getPosition(document.getElementById("sourceImage")).y + linkY + linkHeight + "px";
+                        document.getElementById("tooltip").style.top = getPosition(document.getElementById("sourceImage")).y + linkY + linkHeight + 10+ "px";
                         document.getElementById("tooltip").getContext('2d').clearRect(0, 0, document.getElementById("tooltip").width, document.getElementById("tooltip").height); 
                         document.getElementById("tooltip").getContext('2d').textAlign="center";
                         document.getElementById("tooltip").getContext('2d').textBaseline = 'middle';
