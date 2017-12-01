@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>臉部資訊</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+</head>
+<body>
+
+<script type="text/javascript">
+    function processImage() {
+        // **********************************************
+        // *** Update or verify the following values. ***
+        // **********************************************
+
+        // Replace the subscriptionKey string value with your valid subscription key.
+        var subscriptionKey = "9d6a1ca25f99470d83129b050d64f3b3";
+
+        // Replace or verify the region.
+        //
+        // You must use the same region in your REST API call as you used to obtain your subscription keys.
+        // For example, if you obtained your subscription keys from the westus region, replace
+        // "westcentralus" in the URI below with "westus".
+        //
+        // NOTE: Free trial subscription keys are generated in the westcentralus region, so if you are using
+        // a free trial subscription key, you should not need to change this region.
+        var uriBase = "https://westcentralus.api.cognitive.microsoft.com/face/v1.0/detect";
+
+        // Request parameters.
+        var params = {
+            "returnFaceId": "true",
+            "returnFaceLandmarks": "false",
+            "returnFaceAttributes": "age,gender,headPose,smile,facialHair,glasses,emotion,hair,makeup,occlusion,accessories,blur,exposure,noise",
+        };
+
+        // Display the image.
+        var sourceImageUrl = document.getElementById("inputImage").value;
+        var image = new Image();       
+        image.onload = function() {
+            // When image loaded, you can then draw it on the canvas.
+            document.getElementById("sourceImage").width=image.width*(500/image.width);
+            document.getElementById("sourceImage").height=image.height*(500/image.width);
+            document.getElementById("sourceImage").getContext('2d').drawImage(image, 0, 0,image.width*(500/image.width),image.height*(500/image.width));
+        };        
+        image.src=sourceImageUrl; 
+
+        // Perform the REST API call.
+        $.ajax({
+            url: uriBase + "?" + $.param(params),
+
+            // Request headers.
+            beforeSend: function(xhrObj){
+                xhrObj.setRequestHeader("Content-Type","application/json");
+                xhrObj.setRequestHeader("Ocp-Apim-Subscription-Key", subscriptionKey);
+            },
+
+            type: "POST",
+
+            // Request body.
+            data: '{"url": ' + '"' + sourceImageUrl + '"}',
+        })
+
+        .done(function(data) {
+            // Show formatted JSON on webpage.
+            $("#responseTextArea").val(JSON.stringify(data, null, 2));   
+            for( var i=0; i < data.length; i++ ){
+                var response = data[i];
+                document.getElementById("sourceImage").getContext('2d').strokeStyle="red";
+                document.getElementById("sourceImage").getContext('2d').lineWidth=5;
+                document.getElementById("sourceImage").getContext('2d').strokeRect(response.faceRectangle.left*(500/image.width), response.faceRectangle.top*(500/image.width), response.faceRectangle.width*(500/image.width), response.faceRectangle.height*(500/image.width));
+            }  
+            document.getElementById("sourceImage").addEventListener("mousemove", on_mousemove, false);
+            function getPosition (element) {
+                var x = 0;
+                var y = 0;
+
+                while ( element ) {
+                  x += element.offsetLeft - element.scrollLeft + element.clientLeft;
+                  y += element.offsetTop - element.scrollLeft + element.clientTop;
+                  element = element.offsetParent;
+                }
+
+                return { x: x, y: y };
+              }
+            function on_mousemove (ev) {    
+                var x, y;
+                if (ev.layerX || ev.layerX == 0) { // For Firefox
+                    x = ev.layerX;
+                    y = ev.layerY;
+                }
+                for ( var i=0; i < data.length; i++ ) {
+                    var response = data[i];
+                    var linkX = response.faceRectangle.left*(500/image.width);
+                    var linkY = response.faceRectangle.top*(500/image.width);
+                    var linkWidth = response.faceRectangle.width*(500/image.width);
+                    var linkHeight = response.faceRectangle.height*(500/image.width);
+                    if (x >= linkX && x <= (linkX + linkWidth) && y >= linkY && y <= (linkY + linkHeight)){
+                        document.getElementById("tooltip").style.display = "";
+                        document.getElementById("tooltip").style.left = getPosition(document.getElementById("sourceImage")).x + linkX + "px";
+                        document.getElementById("tooltip").style.width = 300 + "px";
+                        document.getElementById("tooltip").style.top = getPosition(document.getElementById("sourceImage")).y + linkY + linkHeight + "px";
+                        document.getElementById("tooltip").style.height = 50 + "px";
+                        document.getElementById("tooltip").getContext('2d').clearRect(0, 0, document.getElementById("tooltip").width, document.getElementById("tooltip").height); 
+                        document.getElementById("tooltip").getContext('2d').textAlign="start";
+                        document.getElementById("tooltip").getContext('2d').textBaseline = 'hanging';
+                        document.getElementById("tooltip").getContext('2d').font = "40px arial";
+                        document.getElementById("tooltip").getContext('2d').fillText(response.faceAttributes.gender+",Age  : "+response.faceAttributes.age, 5 ,40);
+                        break;
+                    }
+                    else {
+                        document.getElementById("tooltip").style.display = "none";
+                    }
+                };
+            }
+        })
+
+        .fail(function(jqXHR, textStatus, errorThrown) {
+            // Display error message.
+            var errorString = (errorThrown === "") ? "Error. " : errorThrown + " (" + jqXHR.status + "): ";
+            errorString += (jqXHR.responseText === "") ? "" : (jQuery.parseJSON(jqXHR.responseText).message) ? 
+                jQuery.parseJSON(jqXHR.responseText).message : jQuery.parseJSON(jqXHR.responseText).error.message;
+            alert(errorString);
+        });
+    };
+</script>
+
+<h1>臉部資訊：</h1>
+輸入包含臉部的圖像的網址，然後點擊 <strong>分析</strong> 按鈕。
+<br><br>
+要分析的圖像: <input type="text" name="inputImage" id="inputImage" value="" placeholder="輸入網址"/>
+<button onclick="processImage()">分析</button>
+<br><br>
+<div id="wrapper" style="width:1020px; display:table;">
+    <div id="jsonOutput" style="width:600px; display:table-cell;">
+        回應:
+        <br><br>
+        <textarea id="responseTextArea" class="UIInput" style="width:580px; height:400px;"></textarea>
+    </div>
+    <div id="imageDiv" style="width:420px; display:table-cell;">
+        你的圖片:
+        <br><br>
+        <canvas id="sourceImage"></canvas>       
+        <canvas id="tooltip" style="display:none;position:absolute;background-color:gray;"></canvas> 
+    </div>
+</div>
+<footer>
+    <p>Posted by: charlie890414</p>
+</footer>
+</body>
+</html>
